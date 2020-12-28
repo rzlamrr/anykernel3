@@ -41,5 +41,14 @@ dump_boot;
 
 
 write_boot;
+
+# Another hack for SiLonT
+mount -o remount,rw /vendor;
+if [ -e /vendor/etc/init/hw/init.target.rc ]; then
+    cp /vendor/etc/init/hw/init.target.rc  /vendor/etc/init/hw/init.target.rc.bak
+    sed -i 's/\/proc\/tp_gesture/\/sys\/touchpanel\/double_tap/g' /vendor/etc/init/hw/init.target.rc
+    chmod 644 /vendor/etc/init/hw/init.target.rc
+    write /sys/touchpanel/double_tap 1
+fi;
 ## end install
 
