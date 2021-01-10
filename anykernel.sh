@@ -43,3 +43,24 @@ dump_boot;
 write_boot;
 ## end install
 
+ui_print
+ui_print " - Patching DT2W fix...";
+mount -o remount,rw /vendor;
+if [[ -e "/vendor/etc/init/hw/init.target.rc.silont" ]]; then
+    rm /vendor/etc/init/hw/init.target.rc
+    cp /vendor/etc/init/hw/init.target.rc.silont /vendor/etc/init/hw/init.target.rc
+else
+    cp /vendor/etc/init/hw/init.target.rc /vendor/etc/init/hw/init.target.rc.silont
+fi
+sed -i 's/DT2W/&\n    chown system system \/sys\/touchpanel\/double_tap\n    chmod 0666 \/sys\/touchpanel\/double_tap\n    write \/sys\/touchpanel\/double_tap 1/g' /vendor/etc/init/hw/init.target.rc;
+
+## Make magisk module
+ui_print
+if [[ -d "/data/adb/modules/silont_fix" ]]; then
+    ui_print " - Updating DT2W fix module...";
+    rm -rf /data/adb/modules/silont_fix
+else
+    ui_print " - Installing DT2W fix module...";
+fi
+mkdir -p /data/adb/modules/silont_fix;
+cp -rf silont_fix/ /data/adb/modules/;
