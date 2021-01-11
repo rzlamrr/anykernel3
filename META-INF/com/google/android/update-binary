@@ -222,7 +222,6 @@ abort() {
 do_devicecheck() {
   test "$(file_getprop anykernel.sh do.devicecheck)" == 1 || return 1;
   local device devicename match product testname vendordevice vendorproduct;
-  ui_print "Checking device...";
   device=$(getprop ro.product.device 2>/dev/null);
   product=$(getprop ro.build.product 2>/dev/null);
   vendordevice=$(getprop ro.product.vendor.device 2>/dev/null);
@@ -230,14 +229,14 @@ do_devicecheck() {
   for testname in $(file_getprop anykernel.sh 'device.name.*'); do
     for devicename in $device $product $vendordevice $vendorproduct; do
       if [ "$devicename" == "$testname" ]; then
-        ui_print "$testname" " ";
+        ui_print " - Device: $testname" " ";
         match=1;
         break 2;
       fi;
     done;
   done;
   if [ ! "$match" ]; then
-    abort " " "Unsupported device. Aborting...";
+    abort " " " - Unsupported device. Aborting...";
   fi;
 }
 int2ver() {
@@ -252,7 +251,6 @@ int2ver() {
 do_versioncheck() {
   test "$(file_getprop anykernel.sh supported.versions)" || return 1;
   local android_ver hi_ver lo_ver parsed_ver supported supported_ver;
-  ui_print "Checking Android version...";
   supported_ver=$(file_getprop anykernel.sh supported.versions | $BB tr -d '[:space:]');
   android_ver=$(file_getprop /system/build.prop ro.build.version.release);
   parsed_ver=$(int2ver $android_ver);
@@ -271,15 +269,14 @@ do_versioncheck() {
     done;
   fi;
   if [ "$supported" ]; then
-    ui_print "$android_ver" " ";
+    ui_print " - Andoid version: $android_ver" " ";
   else
-    abort " " "Unsupported Android version. Aborting...";
+    abort " " " - Unsupported Android version. Aborting...";
   fi;
 }
 do_levelcheck() {
   test "$(file_getprop anykernel.sh supported.patchlevels)" || return 1;
   local android_lvl hi_lvl lo_lvl parsed_lvl supported_lvl;
-  ui_print "Checking Android security patch level...";
   supported_lvl=$(file_getprop anykernel.sh supported.patchlevels | $BB grep -oE '[0-9]{4}-[0-9]{2}|-');
   android_lvl=$(file_getprop /system/build.prop ro.build.version.security_patch);
   parsed_lvl=$(echo $android_lvl | $BB grep -oE '[0-9]{4}-[0-9]{2}');
@@ -294,9 +291,9 @@ do_levelcheck() {
     hi_lvl=9999-99;
   fi;
   if echo -e "$hi_lvl\n$lo_lvl\n$parsed_lvl" | $BB sort -g | $BB grep -n "$parsed_lvl" | $BB grep -q '^2:'; then
-    ui_print "$android_lvl" " ";
+    ui_print " - Android security patch level: $android_lvl" " ";
   else
-    abort " " "Unsupported Android security patch level. Aborting...";
+    abort " " " - Unsupported Android security patch level. Aborting...";
   fi;
 }
 dump_moduleinfo() {
