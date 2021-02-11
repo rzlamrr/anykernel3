@@ -15,7 +15,7 @@ device.name2=willow
 device.name3=
 device.name4=
 device.name5=
-supported.versions=8 - 11
+supported.versions=9 - 10
 supported.patchlevels=
 '; } # end properties
 
