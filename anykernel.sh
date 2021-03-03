@@ -42,27 +42,11 @@ dump_boot;
 
 write_boot;
 ## end install
-mount -o remount,rw /vendor;
-STARGET="/vendor/etc/init/hw/init.target.rc"
-FTARGET="/vendor/etc/init/hw/init.target.rc.silont"
-if grep '/sys/touchpanel/double_tap' "${STARGET}" > /dev/null; then
-    dtw=true
-    ui_print " " " - Skipping DT2W patch..."
-else
-    ui_print " " " - Patching DT2W fix..."
-    if [[ -e "${FTARGET}" ]]; then
-        ftw=true
-        rm "${FTARGET}"
-        cp "${FTARGET}" "${STARGET}"
-    else
-        cp "${STARGET}" "${FTARGET}"
-    fi
-    sed -i 's/DT2W/&\n    chown system system \/sys\/touchpanel\/double_tap\n    chmod 0666 \/sys\/touchpanel\/double_tap\n    write \/sys\/touchpanel\/double_tap 1/g' "${STARGET}"
-fi
 
-## Make magisk module
-if [[ "${dtw}" == "true" && "${ftw}" != "true" ]]; then
-    :
+mount -o remount,rw /vendor
+TARGET="/vendor/etc/init/hw/init.target.rc"
+if grep '/sys/touchpanel/double_tap' "${TARGET}" > /dev/null; then
+    ui_print " " " - Skipping DT2W patch..."
 else
     if [[ -d "/data/adb/modules/silont_fix" ]]; then
         ui_print " " " - Updating DT2W fix module..." " "
